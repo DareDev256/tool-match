@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { UserProgress, Category } from "@/types/game";
 import {
   getProgress,
@@ -11,13 +11,11 @@ import {
 } from "@/lib/storage";
 
 export function useProgress(categories?: Category[]) {
-  const [progress, setProgress] = useState<UserProgress | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setProgress(getProgress());
-    setIsLoading(false);
-  }, []);
+  const [progress, setProgress] = useState<UserProgress | null>(() => {
+    if (typeof window === "undefined") return null;
+    return getProgress();
+  });
+  const isLoading = progress === null;
 
   const earnXP = useCallback((amount: number) => {
     const updated = addXP(amount);
