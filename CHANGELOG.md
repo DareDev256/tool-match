@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1] - 2026-02-26
+
+### Changed
+- Rewrote README to portfolio-grade documentation with architecture diagram, data flow explanation, design decisions rationale, and enrichment-first philosophy
+- Added curriculum roadmap table showing 15/320 items live with expansion plan
+- Documented key design decisions (no API keys, Web Audio, FSRS, mastery gates, enrichment-first)
+- Added visual design section with color palette and aesthetic rationale
+
 ## [0.2.0] - 2026-02-21
 
 ### Added
