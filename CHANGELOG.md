@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2] - 2026-03-07
+
+### Changed
+- Rewrote README with persistence layer documentation (6 localStorage keys table), route/pages table, tech stack table format, and data flow diagram
+- Added categories page to architecture tree
+- Documented "Don't Use AI" as first-class answer design decision with scoring rationale
+- Restructured visual design section as color token table with hex values and roles
+
 ## [0.2.1] - 2026-02-26
 
 ### Changed
