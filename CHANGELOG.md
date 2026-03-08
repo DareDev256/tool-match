@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3] - 2026-03-08
+
+### Fixed
+- Task selection now uses diversity-aware picking instead of naive shuffle
+- Guarantees proportional category balance (text vs visual tasks) each session
+- Ensures at least 2 "Don't Use AI" items per round (game's signature mechanic)
+- Fills remaining slots proportionally, preventing single-category dominance
+
 ## [0.2.2] - 2026-03-07
 
 ### Changed

@@ -122,7 +122,7 @@ All state lives in `localStorage` under the `tool_match` namespace. Six storage 
 | Route | Purpose |
 |-------|---------|
 | `/` | Landing — title, streak badge, XP bar, start/categories buttons |
-| `/play` | Core game loop — 10 shuffled items, tap-to-select, enrichment |
+| `/play` | Core game loop — 10 diversity-picked items, tap-to-select, enrichment |
 | `/categories` | Browse categories with expand/collapse levels, completion %, mastery locks |
 
 ## Key Design Decisions
@@ -138,6 +138,8 @@ All state lives in `localStorage` under the `tool_match` namespace. Six storage 
 **Enrichment-first curriculum.** Every item carries `whyItMatters`, `realWorldExample`, and `proTip`. The game teaches *reasoning about tool selection*, not memorization of correct answers. The feedback panel is where the real learning happens.
 
 **"Don't Use AI" as first-class answer.** Not a trick option or gotcha — it's weighted with +15 bonus points (vs +10 for correct tool matches) because recognizing AI's limits is harder and more valuable than knowing its capabilities.
+
+**Diversity-aware task selection.** Each 10-item round is built with proportional category balance and a guaranteed floor of 2 "Don't Use AI" items. Naive shuffle let sessions skew 8-2 across categories or omit the game's signature mechanic entirely — the diversity picker prevents both.
 
 ## Curriculum
 
