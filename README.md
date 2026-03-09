@@ -84,11 +84,13 @@ src/
 ├── data/
 │   └── curriculum.ts           Tools definition + 15 task items
 ├── hooks/
+│   ├── useGameEngine.ts        Game state machine (score, combos, transitions)
 │   ├── useGameStats.ts         Session tracking (correct/incorrect/time)
 │   ├── useProgress.ts          XP, levels, streaks, mastery gates
 │   └── useSoundEffects.ts      Web Audio API — zero external files
 ├── lib/
-│   └── storage.ts              localStorage persistence layer (6 keys)
+│   ├── storage.ts              localStorage persistence layer (6 keys)
+│   └── task-picker.ts          Diversity-aware task selection algorithm
 └── types/
     └── game.ts                 Shared interfaces
 ```
@@ -97,11 +99,12 @@ src/
 
 ```
 Player taps tool
-  → handleSelect() checks answer
+  → useGameEngine.handleSelect() checks answer
   → useGameStats records result (session state)
   → Score computed: base + speed bonus × combo multiplier
   → On round end: useProgress awards XP → storage.ts persists
   → Enrichment panel reveals the WHY
+  → task-picker.diversePick() selects next round's items
 ```
 
 ### Persistence Layer

@@ -1,159 +1,14 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { items, getToolById, ToolMatchItem } from "@/data/curriculum";
-import { useGameStats } from "@/hooks/useGameStats";
-import { useProgress } from "@/hooks/useProgress";
-import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useGameEngine } from "@/hooks/useGameEngine";
 import { VictoryScreen } from "@/components/game/VictoryScreen";
 import { Button } from "@/components/ui/Button";
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-/**
- * Diversity-aware task picker. Guarantees:
- * 1. Proportional category balance (text vs visual)
- * 2. At least 2 "Don't Use AI" items per session (first-class mechanic)
- * 3. Answer tool diversity — no single correct tool dominates
- * 4. Final order is shuffled so patterns aren't predictable
- */
-function diversePick(pool: ToolMatchItem[], count: number): ToolMatchItem[] {
-  if (pool.length <= count) return shuffle(pool);
-
-  // Split by category for proportional representation
-  const byCategory = new Map<string, ToolMatchItem[]>();
-  for (const item of pool) {
-    const list = byCategory.get(item.category) ?? [];
-    list.push(item);
-    byCategory.set(item.category, list);
-  }
-
-  // Guarantee "Don't Use AI" floor — the game's signature mechanic
-  const noAiItems = shuffle(pool.filter((i) => i.answer === "dont-use-ai"));
-  const noAiFloor = Math.min(2, noAiItems.length);
-  const guaranteed = noAiItems.slice(0, noAiFloor);
-  const guaranteedIds = new Set(guaranteed.map((i) => i.id));
-
-  // Fill remaining slots proportionally from each category
-  const remaining = count - guaranteed.length;
-  const availableByCategory = new Map<string, ToolMatchItem[]>();
-  for (const [cat, catItems] of byCategory) {
-    availableByCategory.set(cat, shuffle(catItems.filter((i) => !guaranteedIds.has(i.id))));
-  }
-
-  const categoryKeys = [...availableByCategory.keys()];
-  const totalAvailable = categoryKeys.reduce((sum, k) => sum + (availableByCategory.get(k)?.length ?? 0), 0);
-
-  const picked: ToolMatchItem[] = [...guaranteed];
-  const pickedIds = new Set(guaranteedIds);
-
-  // Proportional allocation per category
-  for (const cat of categoryKeys) {
-    const catPool = availableByCategory.get(cat) ?? [];
-    const share = Math.round((catPool.length / totalAvailable) * remaining);
-    const take = Math.min(share, catPool.length);
-    for (let i = 0; i < take && picked.length < count; i++) {
-      picked.push(catPool[i]);
-      pickedIds.add(catPool[i].id);
-    }
-  }
-
-  // Fill any remainder (rounding gaps) from unused items
-  if (picked.length < count) {
-    const unused = shuffle(pool.filter((i) => !pickedIds.has(i.id)));
-    for (const item of unused) {
-      if (picked.length >= count) break;
-      picked.push(item);
-    }
-  }
-
-  return shuffle(picked);
-}
-
 export default function PlayPage() {
-  const [queue, setQueue] = useState<ToolMatchItem[]>(() => diversePick(items, 10));
-  const [idx, setIdx] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
-  const [combo, setCombo] = useState(0);
-  const [score, setScore] = useState(0);
-  const [taskStart, setTaskStart] = useState(() => Date.now());
-  const [enrichment, setEnrichment] = useState<ToolMatchItem["enrichment"] | null>(null);
-  const [done, setDone] = useState(false);
+  const engine = useGameEngine();
 
-  const { stats, startTracking, stopTracking, recordAnswer } = useGameStats();
-  const { earnXP } = useProgress();
-  const sfx = useSoundEffects();
-
-  const initialized = useRef(false);
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    startTracking();
-  }, [startTracking]);
-
-  const current = queue[idx];
-  const currentTools = useMemo(
-    () => (current ? current.toolOptions.map((id) => getToolById(id)).filter(Boolean) : []),
-    [current]
-  );
-
-  const handleSelect = useCallback(
-    (toolId: string) => {
-      if (feedback || !current) return;
-      setSelected(toolId);
-
-      const isCorrect = toolId === current.answer;
-      const elapsed = (Date.now() - taskStart) / 1000;
-      const speedBonus = Math.max(1, Math.min(5, Math.ceil(6 - elapsed)));
-      const isDontUseAi = current.answer === "dont-use-ai";
-
-      let pts = 0;
-      if (isCorrect) {
-        pts = isDontUseAi && toolId === "dont-use-ai" ? 15 : 10;
-        pts += speedBonus;
-        pts *= Math.min(combo + 1, 4); // combo cap at 4x
-        setCombo((c) => c + 1);
-        sfx.playCorrect();
-      } else {
-        pts = toolId === "dont-use-ai" ? -3 : -5;
-        setCombo(0);
-        sfx.playIncorrect();
-      }
-
-      setScore((s) => Math.max(0, s + pts));
-      setFeedback(isCorrect ? "correct" : "wrong");
-      recordAnswer(isCorrect);
-      setEnrichment(current.enrichment ?? null);
-
-      setTimeout(() => {
-        setFeedback(null);
-        setSelected(null);
-        setEnrichment(null);
-        if (idx + 1 >= queue.length) {
-          stopTracking();
-          setDone(true);
-          const xpEarned = Math.max(10, Math.round(score / 5));
-          earnXP(xpEarned);
-          sfx.playCelebration();
-        } else {
-          setIdx((i) => i + 1);
-          setTaskStart(Date.now());
-        }
-      }, 2200);
-    },
-    [feedback, current, taskStart, combo, idx, queue.length, score, recordAnswer, stopTracking, earnXP, sfx]
-  );
-
-  if (!queue.length) {
+  if (engine.isEmpty) {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <p className="font-pixel text-xs text-game-primary animate-pulse-neon">LOADING WORKSHOP...</p>
@@ -161,25 +16,27 @@ export default function PlayPage() {
     );
   }
 
-  if (done) {
+  if (engine.done) {
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
         <VictoryScreen
-          results={{ xp: Math.max(10, Math.round(score / 5)), accuracy: stats.accuracy, speed: stats.elapsedSeconds, correctAnswers: stats.correct, totalQuestions: stats.total }}
+          results={{ xp: engine.xpEarned, accuracy: engine.stats.accuracy, speed: engine.stats.elapsedSeconds, correctAnswers: engine.stats.correct, totalQuestions: engine.stats.total }}
           speedLabel="Time (s)"
-          onPlayAgain={() => { setQueue(diversePick(items, 10)); setIdx(0); setScore(0); setCombo(0); setDone(false); setTaskStart(Date.now()); startTracking(); }}
+          onPlayAgain={engine.handlePlayAgain}
           onBackToMenu={() => { window.location.href = "/"; }}
         />
       </main>
     );
   }
 
+  const { current, currentTools, idx, queueLength, selected, feedback, combo, score, enrichment } = engine;
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-between p-4 md:p-8 relative">
       {/* HUD */}
       <div className="w-full max-w-2xl flex justify-between items-center mb-4">
         <div className="font-pixel text-[10px] text-game-secondary">
-          {idx + 1}<span className="text-game-secondary/40">/{queue.length}</span>
+          {idx + 1}<span className="text-game-secondary/40">/{queueLength}</span>
         </div>
         <div className="font-pixel text-[10px] text-game-accent">
           {score} PTS
@@ -245,7 +102,7 @@ export default function PlayPage() {
             return (
               <motion.button
                 key={tool.id}
-                onClick={() => handleSelect(tool.id)}
+                onClick={() => engine.handleSelect(tool.id)}
                 disabled={!!feedback}
                 whileHover={!feedback ? { scale: 1.04 } : undefined}
                 whileTap={!feedback ? { scale: 0.96 } : undefined}

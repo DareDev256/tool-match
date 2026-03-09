@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0] - 2026-03-09
+
+### Changed
+- Extracted `shuffle` and `diversePick` from play page into `src/lib/task-picker.ts` — pure functions now independently testable
+- Extracted game state machine into `useGameEngine` hook (`src/hooks/useGameEngine.ts`) — scoring, combos, transitions, sound triggers
+- Play page (`src/app/play/page.tsx`) reduced from 282 to 130 lines — now a pure presentation component
+- Extracted magic numbers into named constants (`ROUND_SIZE`, `FEEDBACK_DELAY_MS`, `COMBO_CAP`)
+- `handlePlayAgain` consolidated into hook instead of inline anonymous function
+
 ## [0.2.3] - 2026-03-08
 
 ### Fixed
