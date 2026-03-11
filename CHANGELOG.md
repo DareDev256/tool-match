@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.1] - 2026-03-11
+
+### Added
+- Vitest + happy-dom test infrastructure with path alias support
+- 41 tests across 3 suites: scoring formula, task picker algorithm, curriculum data integrity
+- Scoring tests: speed bonus clamping, combo cap at 4x, "Don't Use AI" bonus (+15), wrong answer penalties, XP minimum floor
+- Task picker tests: diversity guarantees (≥2 no-AI items), no duplicates, proportional category balance, edge cases (empty pool, single no-AI item)
+- Curriculum tests: no duplicate IDs, every answer references valid tool, every item's toolOptions include correct answer, level→item referential integrity
+- `npm run test` and `npm run test:watch` scripts
+
 ## [0.3.0] - 2026-03-09
 
 ### Changed

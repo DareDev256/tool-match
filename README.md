@@ -174,6 +174,7 @@ Open [http://localhost:3000](http://localhost:3000). No environment variables, n
 npm run dev    # Development server (Turbopack)
 npm run build  # Production build
 npm run lint   # ESLint 9 flat config
+npm run test   # Vitest — 41 tests across scoring, task picker, curriculum
 ```
 
 ## Tech Stack
