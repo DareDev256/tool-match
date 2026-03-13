@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { items, getToolById, ToolMatchItem, Tool } from "@/data/curriculum";
-import { Enrichment } from "@/types/game";
+import type { ToolMatchItem, Tool } from "@/data/curriculum";
+import { items, getToolById } from "@/data/curriculum";
+import type { Enrichment } from "@/types/game";
 import { useGameStats } from "@/hooks/useGameStats";
 import { useProgress } from "@/hooks/useProgress";
 import { useSoundEffects } from "@/hooks/useSoundEffects";

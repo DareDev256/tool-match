@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2] - 2026-03-13
+
+### Fixed
+- Removed duplicate `eslint-config-next/typescript` spread — `core-web-vitals` already bundles it, causing duplicate `@typescript-eslint` and `@next/next` plugin registrations
+- Removed redundant `globalIgnores()` call — `core-web-vitals` already sets `.next/`, `out/`, `build/`, `next-env.d.ts` ignores
+- Added `@typescript-eslint/consistent-type-imports` rule to enforce `import type` for type-only imports
+- Auto-fixed 8 type-only import violations across 7 source files
+
 ## [0.3.1] - 2026-03-11
 
 ### Added

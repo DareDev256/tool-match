@@ -1,4 +1,4 @@
-import { UserProgress } from "@/types/game";
+import type { UserProgress } from "@/types/game";
 
 // ─── Passionate Learning — Persistence Layer ───
 // Pure functions over localStorage. SSR-safe. Merge-on-read for forward compat.

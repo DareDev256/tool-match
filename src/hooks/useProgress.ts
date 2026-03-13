@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { UserProgress, Category } from "@/types/game";
+import type { UserProgress, Category } from "@/types/game";
 import {
   getProgress,
   addXP,

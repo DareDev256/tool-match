@@ -1,4 +1,4 @@
-import { ContentItem, Category } from "@/types/game";
+import type { ContentItem, Category } from "@/types/game";
 
 // ─── TOOL MATCH CURRICULUM ───
 // AI tool selection training: match tasks to the right tool

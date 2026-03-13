@@ -1,4 +1,4 @@
-import { ToolMatchItem } from "@/data/curriculum";
+import type { ToolMatchItem } from "@/data/curriculum";
 
 /**
  * Fisher-Yates shuffle. Returns a new array — never mutates input.

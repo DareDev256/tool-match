@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GameResults } from "@/types/game";
+import type { GameResults } from "@/types/game";
 import { Button } from "@/components/ui/Button";
 
 interface VictoryScreenProps {
