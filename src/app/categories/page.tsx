@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { categories, getItemsByLevel } from "@/data/curriculum";
+import type { ToolMatchCategoryId } from "@/data/curriculum";
 import { useProgress } from "@/hooks/useProgress";
 import { Button } from "@/components/ui/Button";
 
@@ -21,7 +22,7 @@ export default function CategoriesPage() {
     );
   }
 
-  function getLevelCompletion(categoryId: string, levelId: number): number {
+  function getLevelCompletion(categoryId: ToolMatchCategoryId, levelId: number): number {
     if (!progress) return 0;
     const levelItems = getItemsByLevel(categoryId, levelId);
     if (levelItems.length === 0) return 0;
@@ -31,7 +32,7 @@ export default function CategoriesPage() {
     return Math.round((answered / levelItems.length) * 100);
   }
 
-  function getCategoryCompletion(categoryId: string): number {
+  function getCategoryCompletion(categoryId: ToolMatchCategoryId): number {
     const cat = categories.find((c) => c.id === categoryId);
     if (!cat || !progress) return 0;
     const totalItems = cat.levels.reduce((sum, level) => {
@@ -48,7 +49,7 @@ export default function CategoriesPage() {
     return Math.round((answeredItems / totalItems) * 100);
   }
 
-  function isLevelCompleted(categoryId: string, levelId: number): boolean {
+  function isLevelCompleted(categoryId: ToolMatchCategoryId, levelId: number): boolean {
     if (!progress) return false;
     return progress.completedLevels.includes(`${categoryId}-${levelId}`);
   }

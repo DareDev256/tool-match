@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { items, tools, categories, getToolById, getItemsByCategory, getItemsByLevel } from "@/data/curriculum";
+import type { ToolId, ToolMatchCategoryId } from "@/data/curriculum";
 
 // ─── Data Integrity ───
 
@@ -93,7 +94,8 @@ describe("getToolById", () => {
   });
 
   it("returns undefined for invalid ID", () => {
-    expect(getToolById("nonexistent")).toBeUndefined();
+    // Intentional type assertion — tests runtime safety for bad data
+    expect(getToolById("nonexistent" as ToolId)).toBeUndefined();
   });
 });
 
@@ -105,7 +107,8 @@ describe("getItemsByCategory", () => {
   });
 
   it("returns empty array for nonexistent category", () => {
-    expect(getItemsByCategory("fake-category")).toEqual([]);
+    // Intentional type assertion — tests runtime safety for bad data
+    expect(getItemsByCategory("fake-category" as ToolMatchCategoryId)).toEqual([]);
   });
 });
 
@@ -116,7 +119,8 @@ describe("getItemsByLevel", () => {
   });
 
   it("returns empty for nonexistent category", () => {
-    expect(getItemsByLevel("fake", 1)).toEqual([]);
+    // Intentional type assertion — tests runtime safety for bad data
+    expect(getItemsByLevel("fake" as ToolMatchCategoryId, 1)).toEqual([]);
   });
 
   it("returns empty for nonexistent level", () => {

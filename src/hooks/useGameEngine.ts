@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import type { ToolMatchItem, Tool } from "@/data/curriculum";
+import type { ToolMatchItem, Tool, ToolId } from "@/data/curriculum";
 import { items, getToolById } from "@/data/curriculum";
 import type { Enrichment } from "@/types/game";
 import { useGameStats } from "@/hooks/useGameStats";
@@ -19,7 +19,7 @@ export interface GameEngine {
   currentTools: (Tool | undefined)[];
   idx: number;
   queueLength: number;
-  selected: string | null;
+  selected: ToolId | null;
   feedback: "correct" | "wrong" | null;
   combo: number;
   score: number;
@@ -29,7 +29,7 @@ export interface GameEngine {
   stats: ReturnType<typeof useGameStats>["stats"];
   sfx: ReturnType<typeof useSoundEffects>;
   // Actions
-  handleSelect: (toolId: string) => void;
+  handleSelect: (toolId: ToolId) => void;
   handlePlayAgain: () => void;
   xpEarned: number;
 }
@@ -37,7 +37,7 @@ export interface GameEngine {
 export function useGameEngine(): GameEngine {
   const [queue, setQueue] = useState<ToolMatchItem[]>(() => diversePick(items, ROUND_SIZE));
   const [idx, setIdx] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ToolId | null>(null);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [combo, setCombo] = useState(0);
   const [score, setScore] = useState(0);
@@ -65,7 +65,7 @@ export function useGameEngine(): GameEngine {
   const xpEarned = Math.max(10, Math.round(score / 5));
 
   const handleSelect = useCallback(
-    (toolId: string) => {
+    (toolId: ToolId) => {
       if (feedback || !current) return;
       setSelected(toolId);
 

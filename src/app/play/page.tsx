@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import type { ToolId } from "@/data/curriculum";
 import { useGameEngine } from "@/hooks/useGameEngine";
 import { VictoryScreen } from "@/components/game/VictoryScreen";
 import { Button } from "@/components/ui/Button";

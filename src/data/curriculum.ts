@@ -3,15 +3,35 @@ import type { ContentItem, Category } from "@/types/game";
 // ─── TOOL MATCH CURRICULUM ───
 // AI tool selection training: match tasks to the right tool
 
+// ─── Domain-specific union types ───
+// Compiler catches typos in tool IDs, categories, and game modes at build time.
+// Add new values here when expanding the curriculum.
+
+export type ToolId =
+  | "chatgpt"
+  | "midjourney"
+  | "copilot"
+  | "whisper"
+  | "google-search"
+  | "spreadsheet"
+  | "human-expert"
+  | "dont-use-ai";
+
+export type ToolMatchCategoryId = "text-tasks" | "visual-tasks";
+
+export type GameMode = "match";
+
 export interface Tool {
-  id: string;
+  id: ToolId;
   name: string;
   icon: string;
   color: string;
 }
 
 export interface ToolMatchItem extends ContentItem {
-  toolOptions: string[];
+  answer: ToolId;
+  category: ToolMatchCategoryId;
+  toolOptions: ToolId[];
 }
 
 export const tools: Tool[] = [
@@ -25,7 +45,25 @@ export const tools: Tool[] = [
   { id: "dont-use-ai", name: "No AI", icon: "✕", color: "#ff4444" },
 ];
 
-export const categories: Category[] = [
+export interface ToolMatchLevel {
+  id: number;
+  name: string;
+  items: string[];
+  requiredXp: number;
+  gameMode: GameMode;
+}
+
+export interface ToolMatchCategory {
+  id: ToolMatchCategoryId;
+  title: string;
+  description: string;
+  icon: string;
+  levels: ToolMatchLevel[];
+}
+
+// Cast to Category[] for compatibility with shared hooks (useProgress),
+// but the concrete type enforces correct IDs and game modes at definition.
+export const categories: ToolMatchCategory[] = [
   {
     id: "text-tasks",
     title: "Text Tasks",
@@ -66,11 +104,11 @@ export const items: ToolMatchItem[] = [
   { id: "vt-007", prompt: "Photo-edit a deceased relative into a family photo they missed", answer: "dont-use-ai", category: "visual-tasks", difficulty: "medium", toolOptions: ["midjourney","chatgpt","human-expert","dont-use-ai"], enrichment: { whyItMatters: "This raises deep ethical questions about consent, grief processing, and digital manipulation.", realWorldExample: "Families who used AI for memorial photos reported mixed emotions — comfort but also unease.", proTip: "Grief counselors suggest preserving authentic memories rather than creating synthetic ones." } },
 ];
 
-export function getItemsByCategory(categoryId: string): ToolMatchItem[] {
+export function getItemsByCategory(categoryId: ToolMatchCategoryId): ToolMatchItem[] {
   return items.filter((item) => item.category === categoryId);
 }
 
-export function getItemsByLevel(categoryId: string, levelId: number): ToolMatchItem[] {
+export function getItemsByLevel(categoryId: ToolMatchCategoryId, levelId: number): ToolMatchItem[] {
   const category = categories.find((c) => c.id === categoryId);
   if (!category) return [];
   const level = category.levels.find((l) => l.id === levelId);
@@ -80,6 +118,6 @@ export function getItemsByLevel(categoryId: string, levelId: number): ToolMatchI
     .filter((item): item is ToolMatchItem => item !== undefined);
 }
 
-export function getToolById(id: string): Tool | undefined {
+export function getToolById(id: ToolId): Tool | undefined {
   return tools.find((t) => t.id === id);
 }

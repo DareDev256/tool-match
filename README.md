@@ -82,7 +82,7 @@ src/
 │       ├── StreakBadge.tsx     Fire emoji streak counter
 │       └── XPBar.tsx           Level + XP progress bar
 ├── data/
-│   └── curriculum.ts           Tools definition + 15 task items
+│   └── curriculum.ts           Tools, tasks, and domain types (ToolId, ToolMatchCategoryId, GameMode)
 ├── hooks/
 │   ├── useGameEngine.ts        Game state machine (score, combos, transitions)
 │   ├── useGameStats.ts         Session tracking (correct/incorrect/time)
@@ -182,7 +182,7 @@ npm run test   # Vitest — 41 tests across scoring, task picker, curriculum
 | Layer | Technology |
 |-------|-----------|
 | Framework | Next.js 16 + React 19 |
-| Language | TypeScript (strict mode) |
+| Language | TypeScript (strict mode, domain-typed IDs) |
 | Styling | Tailwind CSS v4 (CSS-first `@theme inline`) |
 | Animation | Framer Motion |
 | Spaced Repetition | ts-fsrs (FSRS-4.5 algorithm) |
